@@ -5,7 +5,7 @@
 <!-- sdlc:auto:start overview -->
 Build a rag chatbot where user can upload there own documents and ask queries about them use gemini-2.5-flash for answers and gemini-embedding-001 for embeddings and have chat history and sessions
 
-**Documentation version:** v2
+**Documentation version:** v3
 <!-- sdlc:auto:end overview -->
 
 ## Contents
@@ -15,7 +15,7 @@ Build a rag chatbot where user can upload there own documents and ask queries ab
 |---|---|
 | [Requirements](requirements/README.md) | v1 approved |
 | [Architecture](architecture/README.md) | 22 entries |
-| [Development](development/README.md) | 1 entry |
+| [Development](development/README.md) | 16 entries |
 | [Testing](testing/README.md) | 1 entry |
 | [Deployment](deployment/README.md) | 1 entry |
 | [Maintenance](maintenance/README.md) | 1 entry |
@@ -31,7 +31,7 @@ Build a rag chatbot where user can upload there own documents and ask queries ab
 | [Runbook](deployment/runbook.md) | not deployed yet |
 | [Release notes](deployment/release-notes.md) | 0 releases |
 | [Traceability matrix](traceability-matrix.md) | 24 requirements |
-| [Changelog](CHANGELOG.md) | 2 versions |
+| [Changelog](CHANGELOG.md) | 3 versions |
 <!-- sdlc:auto:end contents -->
 
 ## Open gaps
@@ -129,7 +129,27 @@ Build a rag chatbot where user can upload there own documents and ask queries ab
 
 ### Development
 
-- The development phase has not started or no sprint plans or tickets were provided.
+- The plan is in 'preview' status. No approval, approver or approval date is recorded.
+- No development activity is recorded: no completed tickets, commits, PRs, sprint dates or sprint outcomes.
+- Stories are not explicitly assigned to sprints. The mapping in the sprint entries is inferred from goal wording.
+- No sprint start or end dates are given.
+- Development has not reported any completed work, so the application is not documented as built.
+- No user guide can be written until implemented screens and features are reported. No App Design screen keys (e.g. SCR-xxx) were provided either.
+- The story-to-sprint mapping is inferred, not stated in the input.
+- The input does not define which file types are supported or the maximum file size (US-006).
+- Retry behaviour for failed documents is not specified (manual or automatic, and the retry limit).
+- US-004 (privacy and isolation) appears scheduled for Sprint 4 as 'hardening'. The input does not say whether baseline per-user isolation is enforced from Sprint 1, when user documents first arrive. This needs confirmation.
+- Document deletion (US-010) lands after attachment (Sprint 3). The input does not say how deleting a document affects chats it is attached to or their past citations.
+- The epic has no assigned owner.
+- No implementation status is recorded for any story.
+- Tasks have no point estimates.
+- The input does not specify chunk size, overlap, embedding dimension, ANN index type or batch size.
+- No frontend role is assigned to the chat session stories, although they imply UI work.
+- The input does not define the threshold or criterion for deciding that the answer is 'not in your documents' (US-017).
+- The input does not specify the value of top-k or the similarity metric.
+- The story owner (integration-agent) differs from every task owner. It is unclear who is accountable for integration.
+- No target devices or breakpoints are specified for the mobile layout.
+- The input does not list the specific environment variables (e.g. model names, S3 bucket, database URL, API keys).
 
 ### Testing
 
