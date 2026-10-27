@@ -1,0 +1,96 @@
+{
+  "key": {
+    "app_design_id": "926ef925-f86e-45ba-9165-00baa797debc",
+    "app_design_version": 1,
+    "architecture_document_id": "a670aeff-2847-4042-934f-40deca285107",
+    "architecture_version": 1
+  },
+  "outcome": "attempted-incomplete",
+  "packages": [
+    {
+      "ecosystem": "pypi",
+      "installed_version": "2.8.0",
+      "name": "google-genai",
+      "status": "installed",
+      "version": ">=1.0.0"
+    },
+    {
+      "ecosystem": "pypi",
+      "installed_version": "6.21.3",
+      "name": "pypdf",
+      "status": "installed",
+      "version": ">=4.0"
+    },
+    {
+      "ecosystem": "pypi",
+      "installed_version": "0.5.1",
+      "name": "pgvector",
+      "status": "installed",
+      "version": ">=0.3.0"
+    },
+    {
+      "ecosystem": "pypi",
+      "installed_version": "1.43.119",
+      "name": "boto3",
+      "status": "installed",
+      "version": ""
+    },
+    {
+      "ecosystem": "pypi",
+      "installed_version": "25.1.0",
+      "name": "argon2-cffi",
+      "status": "installed",
+      "version": ">=23.1.0"
+    },
+    {
+      "ecosystem": "pypi",
+      "installed_version": "0.0.32",
+      "name": "python-multipart",
+      "status": "installed",
+      "version": ""
+    },
+    {
+      "ecosystem": "pypi",
+      "installed_version": "2.3.0",
+      "name": "email-validator",
+      "status": "installed",
+      "version": ">=2.0"
+    },
+    {
+      "ecosystem": "pypi",
+      "installed_version": "2.16.1",
+      "name": "pydantic-settings",
+      "status": "installed",
+      "version": ">=2.0"
+    },
+    {
+      "ecosystem": "npm",
+      "error": "already provided by the scaffold",
+      "name": "react-router",
+      "status": "skipped",
+      "version": ""
+    },
+    {
+      "ecosystem": "npm",
+      "error": "already provided by the scaffold",
+      "name": "react-markdown",
+      "status": "skipped",
+      "version": ""
+    },
+    {
+      "ecosystem": "npm",
+      "error": "already provided by the scaffold",
+      "name": "react-pdf",
+      "status": "skipped",
+      "version": ""
+    },
+    {
+      "ecosystem": "npm",
+      "error": "already provided by the scaffold",
+      "name": "react-dropzone",
+      "status": "skipped",
+      "version": ""
+    }
+  ],
+  "prepared_by_run": "25b423e7-1143-440c-b65d-3db040428bea"
+}
