@@ -5,7 +5,7 @@
 <!-- sdlc:auto:start overview -->
 Build a rag chatbot where user can upload there own documents and ask queries about them use gemini-2.5-flash for answers and gemini-embedding-001 for embeddings and have chat history and sessions
 
-**Documentation version:** v4
+**Documentation version:** v5
 <!-- sdlc:auto:end overview -->
 
 ## Contents
@@ -17,7 +17,7 @@ Build a rag chatbot where user can upload there own documents and ask queries ab
 | [Architecture](architecture/README.md) | 22 entries |
 | [Development](development/README.md) | 13 entries |
 | [Testing](testing/README.md) | 1 entry |
-| [Deployment](deployment/README.md) | 1 entry |
+| [Deployment](deployment/README.md) | 3 entries |
 | [Maintenance](maintenance/README.md) | 1 entry |
 | [Data model](architecture/data-model.md) | generated |
 | [API (OpenAPI)](architecture/api/openapi.yaml) | generated |
@@ -27,11 +27,11 @@ Build a rag chatbot where user can upload there own documents and ask queries ab
 | [API reference](development/api-reference.md) | 1 route |
 | [Test report](testing/test-report.md) | not run yet |
 | [Tests](testing/test-cases.md) | 0 tests |
-| [Deployment guide](deployment/deployment-guide.md) | not deployed yet |
-| [Runbook](deployment/runbook.md) | not deployed yet |
-| [Release notes](deployment/release-notes.md) | 0 releases |
+| [Deployment guide](deployment/deployment-guide.md) | deployed |
+| [Runbook](deployment/runbook.md) | deployed |
+| [Release notes](deployment/release-notes.md) | 1 release |
 | [Traceability matrix](traceability-matrix.md) | 24 requirements |
-| [Changelog](CHANGELOG.md) | 4 versions |
+| [Changelog](CHANGELOG.md) | 5 versions |
 <!-- sdlc:auto:end contents -->
 
 ## Open gaps
@@ -158,7 +158,24 @@ Build a rag chatbot where user can upload there own documents and ask queries ab
 
 ### Deployment
 
-- No deployment recorded yet, to ECS Fargate, CloudFront + S3, RDS or any other target.
+- No deployment date or time recorded.
+- No deployer or approver recorded; no release sign-off documented.
+- No environment name given (e.g. production vs. staging/preview).
+- Version '1b54677ca9a6' looks like a commit or build identifier, but the input does not say what it refers to or link it to a source revision.
+- No release notes or change list.
+- No list of which requirements (US-001 to US-024) are included in this release, so related_ids to requirements could not be set.
+- No post-deployment health check or smoke-test results recorded.
+- No rollback plan or previous version recorded.
+- No monitoring, logging, or alerting configuration recorded.
+- No record of how Gemini API credentials (gemini-2.5-flash, gemini-embedding-001) are configured or secured in the deployed environment.
+- No custom domain recorded; the default Amplify domain is in use.
+- No record of which backend URL or environment variables the frontend build is configured with.
+- No accessibility or availability check result recorded for this URL.
+- No hosting or infrastructure details provided (server type, region, container/runtime).
+- The backend relies on sslip.io wildcard DNS and a raw IP rather than a custom domain; a human should confirm whether this is intended for this environment.
+- No API health endpoint or health-check result recorded.
+- No record of where uploaded documents, embeddings/vector index, and chat history/sessions are persisted in this deployment.
+- No CORS, authentication, or rate-limiting configuration recorded.
 
 ### Maintenance
 
