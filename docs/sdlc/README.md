@@ -5,7 +5,7 @@
 <!-- sdlc:auto:start overview -->
 Build a rag chatbot where user can upload there own documents and ask queries about them use gemini-2.5-flash for answers and gemini-embedding-001 for embeddings and have chat history and sessions
 
-**Documentation version:** v1
+**Documentation version:** v2
 <!-- sdlc:auto:end overview -->
 
 ## Contents
@@ -14,15 +14,15 @@ Build a rag chatbot where user can upload there own documents and ask queries ab
 | Document | State |
 |---|---|
 | [Requirements](requirements/README.md) | v1 approved |
-| [Architecture](architecture/README.md) | 1 entry |
+| [Architecture](architecture/README.md) | 22 entries |
 | [Development](development/README.md) | 1 entry |
 | [Testing](testing/README.md) | 1 entry |
 | [Deployment](deployment/README.md) | 1 entry |
 | [Maintenance](maintenance/README.md) | 1 entry |
-| [Data model](architecture/data-model.md) | not generated yet |
-| [API (OpenAPI)](architecture/api/openapi.yaml) | not generated yet |
-| [Decisions (ADRs)](architecture/adr/README.md) | 0 decisions |
-| [Sprint plan](development/sprint-plan.md) | not generated yet |
+| [Data model](architecture/data-model.md) | generated |
+| [API (OpenAPI)](architecture/api/openapi.yaml) | generated |
+| [Decisions (ADRs)](architecture/adr/README.md) | 4 decisions |
+| [Sprint plan](development/sprint-plan.md) | 6 sprints |
 | [Developer guide](development/developer-guide.md) | not generated yet |
 | [API reference](development/api-reference.md) | 0 routes |
 | [Test report](testing/test-report.md) | not run yet |
@@ -31,7 +31,7 @@ Build a rag chatbot where user can upload there own documents and ask queries ab
 | [Runbook](deployment/runbook.md) | not deployed yet |
 | [Release notes](deployment/release-notes.md) | 0 releases |
 | [Traceability matrix](traceability-matrix.md) | 24 requirements |
-| [Changelog](CHANGELOG.md) | 1 version |
+| [Changelog](CHANGELOG.md) | 2 versions |
 <!-- sdlc:auto:end contents -->
 
 ## Open gaps
@@ -74,13 +74,58 @@ Build a rag chatbot where user can upload there own documents and ask queries ab
 
 ### Architecture
 
-- The architecture phase has not started or no design artifacts were provided. Missing items include:
-- - Data model (users, documents, chunks, chats, messages, attachments)
-- - API design
-- - SSE streaming design
-- - Chunking parameters
-- - Embedding dimension choice
-- - AWS deployment topology
+- The approver and approval date for this architecture are not stated in the input.
+- No mapping from components, endpoints or critical paths to user stories US-001 to US-024 is provided. Requirement-level traceability for this phase cannot be established from the input.
+- The rationale cites NFR-002, NFR-003, NFR-005, NFR-017, NFR-018, NFR-020, NFR-028 and NFR-029. None of these appear in the known requirement key list (US-001 to US-024). Their source and wording need confirmation.
+- No observability, monitoring or alerting design is described beyond logging of failed S3 deletes.
+- No rate limiting or abuse controls for uploads, chat turns or authentication attempts are described.
+- No industry or domain skill was named, so no compliance traceability was performed.
+- The account settings screen's contents beyond change password are not specified. For example, account deletion is not listed among the endpoints.
+- Upload progress is listed, but ingestion is synchronous with no progress endpoint. It is unclear whether progress means transfer progress only.
+- GET /api/health is presumably unauthenticated for the load balancer, but the component description says the auth dependency applies to every route except signup and login. This is a discrepancy that needs confirmation.
+- CSRF protection for cookie-authenticated state-changing requests is not described.
+- Cookie attributes beyond 'signed httpOnly' (for example Secure, SameSite) are not specified.
+- Session lifetime (expires_at duration) and any idle timeout are not specified.
+- It is not stated whether changing the password revokes other active sessions. users.password_changed_at exists, but its use is not described.
+- Password policy (minimum length or complexity) is not specified.
+- Password reset or recovery is not described.
+- The maximum upload size is not specified.
+- Chunk size and overlap values are not specified.
+- Embedding batch size, and handling of Gemini rate limits or quotas during batch embedding, are not specified.
+- The outcome for PDFs with no text layer (scanned or image-only) is not explicitly described, beyond the general failed status. The wording of failure_reason is not specified.
+- Text encoding handling for .txt and .md files is not specified.
+- The top-k value, the relevance threshold value and the history window size N are not specified.
+- Behaviour when a chat has no attached documents is not described.
+- HNSW index parameters (m, ef_construction, ef_search) are not specified.
+- The presigned URL lifetime is not specified.
+- It is not stated whether reduced-dimension (1536) embeddings are normalized before cosine indexing.
+- Timeouts, retry or backoff policy, and quota handling for Gemini calls are not specified.
+- Synchronous ingestion of large files must finish within the ALB idle timeout of 120s. No file size or page limit is stated to guarantee this, and behaviour on timeout is not described.
+- It is not specified whether the S3 object is kept or removed when ingestion fails. Retry implies it is kept.
+- Behaviour when the model output fails Pydantic citation validation is not described. For example, it is unclear whether the turn is marked failed or regenerated, and what the user sees after already-streamed tokens.
+- The exact wording of the canned not-in-documents reply and the SSE event format are not specified.
+- The values of N (history turns) and the threshold are not specified.
+- The outcome if the single S3 delete retry also fails is not described, for example reconciliation of orphaned objects.
+- Allowed values are not enumerated for documents.status (ready and failed are mentioned; any intermediate state is not), messages.turn_status (pending, complete and failed are mentioned), messages.role and messages.answer_kind.
+- Cascade behaviour on chat deletion for message_citations is not explicitly stated. The DELETE /api/chats endpoint mentions messages and attachments only.
+- Uniqueness constraints (for example on users.email or on the chat_documents pair) are not stated.
+- page_number semantics for .txt and .md files (which have no pages) are not stated.
+- Request and response schemas and error codes are not specified.
+- Pagination for the document list is not specified.
+- Error responses for oversized or unsupported files are not specified.
+- The date format in the default chat name is not specified.
+- Pagination for the chat list and message history is not specified. Message history is described as 'full'.
+- Maximum chat name length and question length limits are not specified.
+- It is not explicitly stated that this endpoint is exempt from session authentication (see ARCH-COMP-api).
+- The source of injected secrets (for example Secrets Manager or SSM) is not specified.
+- ECS task count, autoscaling and CPU or memory sizing are not specified.
+- The RDS instance class, Multi-AZ setting and backup retention period are not specified.
+- Environments (dev, staging, prod), networking (VPC and subnets) and the CI/CD pipeline are not described.
+- Discrepancy: the S3 key pattern ends with a trailing slash here (users/{user_id}/documents/{document_id}/) but not in the ingestion component (users/{user_id}/documents/{document_id}). The exact key layout needs confirmation.
+- CloudFront behaviour for long-lived SSE responses on /api/* (origin timeouts, caching disabled) is not specified.
+- NFR-005, NFR-028 and NFR-029 are not in the known requirement key list. Their definitions need to be sourced.
+- NFR-003, NFR-017 and NFR-018 are not in the known requirement key list. Their definitions need to be sourced.
+- The input does not say why AWS was chosen over Google Cloud despite the Gemini dependency. Any cross-cloud latency or egress considerations are undocumented.
 
 ### Development
 

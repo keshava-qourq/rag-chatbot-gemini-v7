@@ -2,6 +2,598 @@
 openapi: 3.1.0
 info:
   title: RAG-chatbot-gemini-v7
-  version: architecture-v0
+  version: architecture-v1
   description: Designed API from the approved architecture (not extracted from code).
-paths: {}
+paths:
+  /api/auth/change-password:
+    post:
+      summary: Change the password with current-password verification.
+      description: Change the password with current-password verification.
+      operationId: post_api_auth_change_password
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: '{current_password, new_password}'
+      responses:
+        '200':
+          description: 204. 400 current password wrong. 422 weak password.
+      security:
+      - bearerAuth: []
+  /api/auth/login:
+    post:
+      summary: Verify credentials and create a server-side session.
+      description: Verify credentials and create a server-side session.
+      operationId: post_api_auth_login
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: '{email, password}'
+      responses:
+        '200':
+          description: 200 {user} + Set-Cookie. 401 generic 'Email or password is
+            incorrect'.
+      security:
+      - bearerAuth: []
+  /api/auth/logout:
+    post:
+      summary: Revoke the current session and clear the cookie.
+      description: Revoke the current session and clear the cookie.
+      operationId: post_api_auth_logout
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: none
+      responses:
+        '200':
+          description: '204'
+      security:
+      - bearerAuth: []
+  /api/auth/me:
+    get:
+      summary: Return the current user, used by the SPA route guard.
+      description: Return the current user, used by the SPA route guard.
+      operationId: get_api_auth_me
+      parameters: []
+      responses:
+        '200':
+          description: 200 {id, email}. 401 when signed out.
+      security:
+      - bearerAuth: []
+  /api/auth/signup:
+    post:
+      summary: Create an account and sign in immediately.
+      description: Create an account and sign in immediately.
+      operationId: post_api_auth_signup
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: '{email, password (min 8)}'
+      responses:
+        '200':
+          description: 201 {user} + Set-Cookie session. 409 email already registered.
+            422 field errors.
+      security:
+      - bearerAuth: []
+  /api/chats:
+    get:
+      summary: List the owner's chats by last activity.
+      description: List the owner's chats by last activity.
+      operationId: get_api_chats
+      parameters: []
+      responses:
+        '200':
+          description: '[{id, name, last_message_at}]'
+      security:
+      - bearerAuth: []
+    post:
+      summary: Create a chat named 'New chat <date>'.
+      description: Create a chat named 'New chat <date>'.
+      operationId: post_api_chats
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: '{name?}'
+      responses:
+        '200':
+          description: 201 {chat}
+      security:
+      - bearerAuth: []
+  /api/chats/{id}:
+    get:
+      summary: Chat detail with attached documents.
+      description: Chat detail with attached documents.
+      operationId: get_api_chats_id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: '{id, name, documents:[{id, filename, status}]}'
+      security:
+      - bearerAuth: []
+    patch:
+      summary: Rename the chat.
+      description: Rename the chat.
+      operationId: patch_api_chats_id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: '{name (non-empty)}'
+      responses:
+        '200':
+          description: 200 {chat}. 422 empty name.
+      security:
+      - bearerAuth: []
+    delete:
+      summary: Delete the chat, its messages and attachments.
+      description: Delete the chat, its messages and attachments.
+      operationId: delete_api_chats_id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: '204'
+      security:
+      - bearerAuth: []
+  /api/chats/{id}/documents/{document_id}:
+    put:
+      summary: Attach an owned ready document (link only).
+      description: Attach an owned ready document (link only).
+      operationId: put_api_chats_id_documents_document_id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: document_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: none
+      responses:
+        '200':
+          description: 204. 409 document not ready. 404 if not owned.
+      security:
+      - bearerAuth: []
+    delete:
+      summary: Detach a document from the chat.
+      description: Detach a document from the chat.
+      operationId: delete_api_chats_id_documents_document_id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: document_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: '204'
+      security:
+      - bearerAuth: []
+  /api/chats/{id}/messages:
+    get:
+      summary: Full ordered history with citations and turn status.
+      description: Full ordered history with citations and turn status.
+      operationId: get_api_chats_id_messages
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: '[{id, role, content, answer_kind, turn_status, created_at,
+            citations:[{ordinal, document_id|null, document_name, page_number, chunk_index,
+            passage_text, deleted:boolean}]}]'
+      security:
+      - bearerAuth: []
+    post:
+      summary: Ask a question and stream the answer as text/event-stream.
+      description: Ask a question and stream the answer as text/event-stream.
+      operationId: post_api_chats_id_messages
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: '{text (non-blank)}'
+      responses:
+        '200':
+          description: 'SSE events: turn {user_message_id}, token {text}, done {assistant_message
+            with citations}, error {message, retryable}. 409 no ready documents attached.'
+      security:
+      - bearerAuth: []
+  /api/chats/{id}/messages/{message_id}/retry:
+    post:
+      summary: Re-run retrieval and generation for a failed user turn.
+      description: Re-run retrieval and generation for a failed user turn.
+      operationId: post_api_chats_id_messages_message_id_retry
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: message_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: none
+      responses:
+        '200':
+          description: SSE as above
+      security:
+      - bearerAuth: []
+  /api/documents:
+    get:
+      summary: List the owner's documents, newest first, with attached chats.
+      description: List the owner's documents, newest first, with attached chats.
+      operationId: get_api_documents
+      parameters: []
+      responses:
+        '200':
+          description: '[{id, filename, format, size_bytes, status, failure_reason,
+            chunk_count, created_at, chats:[{id,name}]}]'
+      security:
+      - bearerAuth: []
+    post:
+      summary: Upload and ingest synchronously.
+      description: Upload and ingest synchronously.
+      operationId: post_api_documents
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: multipart file (.pdf, .txt, .md, <= MAX_UPLOAD_MB)
+      responses:
+        '200':
+          description: 201 {document with final status ready|failed}. 415 unsupported
+            type. 413 too large.
+      security:
+      - bearerAuth: []
+  /api/documents/{id}:
+    delete:
+      summary: Delete the document, its chunks, attachments and S3 object.
+      description: Delete the document, its chunks, attachments and S3 object.
+      operationId: delete_api_documents_id
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: 204. 404 if not owned.
+      security:
+      - bearerAuth: []
+  /api/documents/{id}/file-url:
+    get:
+      summary: Short-lived presigned GET URL for the original file.
+      description: Short-lived presigned GET URL for the original file.
+      operationId: get_api_documents_id_file_url
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: '{url, expires_in: 300}. 404 if not owned or deleted.'
+      security:
+      - bearerAuth: []
+  /api/documents/{id}/retry:
+    post:
+      summary: Re-run ingestion from the stored S3 object.
+      description: Re-run ingestion from the stored S3 object.
+      operationId: post_api_documents_id_retry
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: none
+      responses:
+        '200':
+          description: 200 {document with final status}. 404 if not owned.
+      security:
+      - bearerAuth: []
+  /api/health:
+    get:
+      summary: Liveness and DB check for the load balancer.
+      description: Liveness and DB check for the load balancer.
+      operationId: get_api_health
+      parameters: []
+      responses:
+        '200':
+          description: '{status: ok}'
+      security:
+      - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    users:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        password_hash:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        password_changed_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - email
+      - password_hash
+      - created_at
+    user_sessions:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        token_hash:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+        revoked_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - user_id
+      - token_hash
+      - created_at
+      - expires_at
+    documents:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        filename:
+          type: string
+        format:
+          type: string
+        size_bytes:
+          type: integer
+        s3_key:
+          type: string
+        status:
+          type: string
+        failure_reason:
+          type: string
+        chunk_count:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - user_id
+      - filename
+      - format
+      - size_bytes
+      - status
+      - chunk_count
+      - created_at
+    document_chunks:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        chunk_index:
+          type: integer
+        page_number:
+          type: integer
+        char_start:
+          type: integer
+        char_end:
+          type: integer
+        content:
+          type: string
+        embedding:
+          type: string
+      required:
+      - id
+      - document_id
+      - user_id
+      - chunk_index
+      - char_start
+      - char_end
+      - content
+      - embedding
+    chats:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        last_message_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - user_id
+      - name
+      - created_at
+    chat_documents:
+      type: object
+      properties:
+        chat_id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        attached_at:
+          type: string
+          format: date-time
+      required:
+      - chat_id
+      - document_id
+      - attached_at
+    messages:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        chat_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        role:
+          type: string
+        content:
+          type: string
+        answer_kind:
+          type: string
+        turn_status:
+          type: string
+        reply_to_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - chat_id
+      - user_id
+      - role
+      - content
+      - created_at
+    message_citations:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        message_id:
+          type: string
+          format: uuid
+        ordinal:
+          type: integer
+        chunk_id:
+          type: string
+          format: uuid
+        document_id:
+          type: string
+          format: uuid
+        document_name:
+          type: string
+        page_number:
+          type: integer
+        chunk_index:
+          type: integer
+        passage_text:
+          type: string
+      required:
+      - id
+      - message_id
+      - ordinal
+      - document_name
+      - chunk_index
+      - passage_text
